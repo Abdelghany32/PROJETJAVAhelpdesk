@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Profil Agent</title>
+    <div th:replace="~{base :: head}"></div>
+</head>
+<header>
+    <div th:replace="~{base :: logo-ag}"></div>
+</header>
+<body>
+<div class="container">
+    <div class="jumbotron jumbotron-fluid">
+        <h1 class="display-4">Mon Profil</h1>
+    </div>
+
+    <!-- Message de succès -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="row">
+        <!-- Informations de profil -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Informations personnelles</h5>
+                </div>
+                <div class="card-body text-center">
+                    <!-- Photo de profil -->
+                    <div class="mb-3">
+                        <img th:if="${hasProfilePicture}" th:src="@{/agent/profile-picture}" alt="Photo de profil"
+                             class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                        <div th:unless="${hasProfilePicture}" class="bg-secondary rounded-circle d-flex justify-content-center align-items-center mx-auto"
+                             style="width: 150px; height: 150px; color: white;">
+                            <i class="fas fa-user fa-4x"></i>
+                        </div>
+                    </div>
+
+                    <!-- Nom complet -->
+                    <h4 th:text="${profile.getFullName()}">Nom complet</h4>
+
+                    <!-- Email -->
+                    <p class="text-muted">
+                        <i class="fas fa-envelope me-2"></i>
+                        <span th:text="${agent.email}">email@example.com</span>
+                    </p>
+
+                    <!-- Secteur -->
+                    <p class="text-muted">
+                        <i class="fas fa-building me-2"></i>
+                        <span th:text="${sector}">Secteur</span>
+                    </p>
+
+                    <!-- Téléphone -->
+                    <p th:if="${profile.phoneNumber}" class="text-muted">
+                        <i class="fas fa-phone me-2"></i>
+                        <span th:text="${profile.phoneNumber}">+33 123456789</span>
+                    </p>
+
+                    <!-- Lien vers les paramètres -->
+                    <a href="/agent/settings" class="btn btn-primary mt-3">
+                        <i class="fas fa-cog me-2"></i>Modifier mon profil
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Détails du profil -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>À propos de moi</h5>
+                </div>
+                <div class="card-body">
+                    <p th:if="${profile.bio}" th:text="${profile.bio}">
+                        Biographie de l'utilisateur...
+                    </p>
+                    <p th:unless="${profile.bio}" class="text-muted fst-italic">
+                        Vous n'avez pas encore ajouté de biographie. Modifiez votre profil pour en ajouter une.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Informations complémentaires -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Informations complémentaires</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Date de naissance:</h6>
+                            <p th:if="${profile.birthDate}" th:text="${#temporals.format(profile.birthDate, 'dd MMMM yyyy')}">
+                                1er janvier 1990
+                            </p>
+                            <p th:unless="${profile.birthDate}" class="text-muted fst-italic">Non renseignée</p>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Langue préférée:</h6>
+                            <p th:text="${profile.language == 'fr' ? 'Français' :
+                                           (profile.language == 'en' ? 'Anglais' :
+                                           (profile.language == 'es' ? 'Espagnol' : profile.language))}">
+                                Français
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Adresse -->
+                    <div th:if="${profile.address} or ${profile.city} or ${profile.zipCode} or ${profile.country}">
+                        <h6 class="text-muted mb-3">Adresse:</h6>
+                        <address>
+                            <p th:if="${profile.address}" th:text="${profile.address}" class="mb-1">123 Rue Example</p>
+                            <p class="mb-1">
+                                <span th:if="${profile.zipCode}" th:text="${profile.zipCode}">75000</span>
+                                <span th:if="${profile.city}" th:text="${profile.city}">Paris</span>
+                            </p>
+                            <p th:if="${profile.country}" th:text="${profile.country}">France</p>
+                        </address>
+                    </div>
+
+                    <div th:unless="${profile.address} or ${profile.city} or ${profile.zipCode} or ${profile.country}"
+                         class="text-muted fst-italic">
+                        Aucune adresse renseignée
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques de tickets -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Statistiques de tickets</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <h6 class="text-muted">Total</h6>
+                            <h2 th:text="${totalTickets}">12</h2>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h6 class="text-muted">En cours</h6>
+                            <h2 th:text="${inProgressTickets}">3</h2>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h6 class="text-muted">Résolus</h6>
+                            <h2 th:text="${resolvedTickets}">9</h2>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="/agent/dashboard" class="btn btn-outline-primary">
+                            <i class="fas fa-ticket-alt me-2"></i>Voir tous les tickets
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

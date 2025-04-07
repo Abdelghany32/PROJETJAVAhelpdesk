@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+    <div th:replace="~{base :: head}"></div>
+</head>
+<header id="oi">
+    <div th:replace="~{base :: logo-al}"></div>
+</header>
+<body>
+<div class="container">
+    <div class="jumbotron jumbotron-fluid d-flex justify-content-between align-content-end">
+        <h1 class="display-4">Tickets</h1>
+        <div>
+            <p th:text="'Étudiant: ' + ${nome}"></p>
+            <p th:text="'Matricule: ' + ${registration}"></p>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand navbar-light bg-light d-flex justify-content-between mb-3 overflow-auto">
+        <div class="navbar-nav">
+            <!-- Filtres simples par statut uniquement -->
+            <a th:classappend="${status} == null ? 'active'" class="nav-item nav-link" href="/student/dashboard">Tous</a>
+            <a th:classappend="${status} == 'ABERTO' ? 'active'" class="nav-item nav-link" href="/student/dashboard/aberto">Ouvert</a>
+            <a th:classappend="${status} == 'EM_ANDAMENTO' ? 'active'" class="nav-item nav-link" href="/student/dashboard/em_andamento">En cours</a>
+            <a th:classappend="${status} == 'FINALIZADO' ? 'active'" class="nav-item nav-link" href="/student/dashboard/finalizado">Terminé</a>
+        </div>
+        <a href="/ticket/form_ticket"><button class="btn btn-outline-secondary my-2 my-sm-0 mx-2">Nouveau</button></a>
+    </nav>
+    <div th:each="ticket : ${tickets}" class="card mb-3">
+        <!-- En-tête du ticket -->
+        <div class="card-header d-flex justify-content-between align-items-center"
+             th:style="${ticket.priority != null} ? 'border-left: 5px solid ' + ${ticket.priority.getColorCode()} + ';' : ''"
+             th:classappend="${ticket.status.name()} == 'ABERTO' ? 'alert-warning' :
+                                    (${ticket.status.name()} == 'EM_ANDAMENTO' ? 'alert-success' : 'alert-dark')">
+            <span th:text="'Ticket #' + ${ticket.getId()}">Ticket</span>
+            <span th:if="${ticket.priority != null}" class="badge"
+                  th:style="'background-color: ' + ${ticket.priority.getColorCode()} + ';'"
+                  th:text="${ticket.priority}">Priorité</span>
+        </div>
+        <div class="card-body">
+            <div class="d-flex mb-3 flex-wrap justify-content-md-between">
+                <div th:text="${'Sujet: ' + ticket.subject}" class="descricao">Sujet: </div>
+                <div th:text="${'Date: ' + ticket.creationDate}" class="data">Date: </div>
+                <a th:href="@{/ticket/{id}(id=${ticket.id})}"><button type="button" class="btn btn-primary">Accéder</button></a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

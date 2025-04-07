@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nouveau ticket</title>
+    <div th:replace="~{base :: head}"></div>
+</head>
+<header>
+    <title>Créer ticket</title>
+    <div th:replace="~{base :: logo-al}"></div>
+</header>
+<body>
+<div class="container">
+    <div class="jumbotron jumbotron-fluid">
+        <h1 class="display-5">Nouveau Ticket</h1>
+    </div>
+    <form  th:object="${ticket}" method="post" class="ticket-form" th:action="@{/ticket/save_ticket}">
+        <div class="form-group">
+            <label for="subject">Titre</label>
+            <input type="text" th:errorclass="is-invalid" class="form-control" th:field="*{subject}" id="subject" aria-describedby="emailHelp" placeholder="Titre">
+            <div class="invalid-feedback" th:errors="*{subject}">
+                Erreurs de sujet
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="message">Message</label>
+            <textarea th:field="*{message}" th:errorclass="is-invalid" class="form-control" id="message"></textarea>
+            <div class="invalid-feedback" th:errors="*{message}">
+                Erreurs de message
+            </div>
+        </div>
+        <div class="form-group d-flex flex-wrap">
+            <div class="me-4 mb-2">
+                <label for="selecao">Secteur: </label>
+                <select id="selecao" th:field="*{sector}" class="form-select">
+                    <option th:each="sector : ${sectors}" th:value="${sector}" th:text="${sector}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="priority">Priorité: </label>
+                <select id="priority" th:field="*{priority}" class="form-select">
+                    <option th:each="priority : ${priorities}" th:value="${priority}"
+                            th:text="${priority}"
+                            th:style="'color: ' + (${priority} == 'FAIBLE' ? '#28a745' :
+                                          (${priority} == 'MOYEN' ? '#ffc107' :
+                                          (${priority} == 'ELEVE' ? '#fd7e14' : '#dc3545')))">
+                    </option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Soumettre</button>
+    </form>
+</div>
+</body>
+</html>

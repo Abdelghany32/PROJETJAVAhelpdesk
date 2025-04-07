@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard Agent</title>
+    <div th:replace="~{base :: head}"></div>
+</head>
+<header>
+    <div th:replace="~{base :: logo-ag}"></div>
+</header>
+<body>
+<div class="container">
+    <div class="jumbotron jumbotron-fluid d-flex justify-content-between align-content-end">
+        <h1 class="display-4">Gestion des Tickets</h1>
+        <div>
+            <p th:text="'Agent: ' + ${nome}"></p>
+            <p th:text="'Secteur: ' + ${sector}"></p>
+        </div>
+    </div>
+
+    <!-- Filtres avancés -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Filtres</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Statut -->
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Par statut</label>
+                    <div class="d-flex flex-column">
+                        <a th:classappend="${status} == null ? 'active fw-bold'" class="nav-link py-1" href="/agent/dashboard">Tous</a>
+                        <a th:classappend="${status} == 'ABERTO' ? 'active fw-bold'" class="nav-link py-1" href="/agent/dashboard/aberto">Ouverts</a>
+                        <a th:classappend="${status} == 'EM_ANDAMENTO' ? 'active fw-bold'" class="nav-link py-1" href="/agent/dashboard/em_andamento">En cours</a>
+                        <a th:classappend="${status} == 'FINALIZADO' ? 'active fw-bold'" class="nav-link py-1" href="/agent/dashboard/finalizado">Terminés</a>
+                    </div>
+                </div>
+
+                <!-- Priorité -->
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Par priorité</label>
+                    <div class="d-flex flex-column">
+                        <a class="nav-link py-1" href="/agent/dashboard/priority/all">Toutes</a>
+                        <a class="nav-link py-1" href="/agent/dashboard/priority/faible" style="color: #28a745">Faible</a>
+                        <a class="nav-link py-1" href="/agent/dashboard/priority/moyen" style="color: #ffc107">Moyenne</a>
+                        <a class="nav-link py-1" href="/agent/dashboard/priority/eleve" style="color: #fd7e14">Élevée</a>
+                        <a class="nav-link py-1" href="/agent/dashboard/priority/critique" style="color: #dc3545">Critique</a>
+                    </div>
+                </div>
+
+                <!-- Assignation -->
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Par assignation</label>
+                    <div class="d-flex flex-column">
+                        <a class="nav-link py-1" href="/agent/dashboard/assign/all">Tous</a>
+                        <a class="nav-link py-1" href="/agent/dashboard/assign/mine">Mes tickets</a>
+                        <a class="nav-link py-1" href="/agent/dashboard/assign/unassigned">Non assignés</a>
+                        <a class="nav-link py-1" href="/agent/dashboard/assign/others">Autres agents</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des tickets -->
+    <div th:each="ticket : ${tickets}" class="card mb-3">
+        <!-- En-tête du ticket avec indicateur de priorité -->
+        <div class="card-header d-flex justify-content-between align-items-center"
+             th:style="${ticket.priority != null} ? 'border-left: 5px solid ' + ${ticket.priority.getColorCode()} + ';' : ''"
+             th:classappend="${ticket.status.name()} == 'ABERTO' ? 'alert-warning' :
+                                (${ticket.status.name()} == 'EM_ANDAMENTO' ? 'alert-success' : 'alert-dark')">
+            <span th:text="'Ticket #' + ${ticket.getId()}">Ticket</span>
+            <div>
+                    <span th:if="${ticket.priority != null}" class="badge me-2"
+                          th:style="'background-color: ' + ${ticket.priority.getColorCode()} + ';'"
+                          th:text="${ticket.priority}">Priorité</span>
+                <span th:if="${ticket.agent == null}" class="badge bg-secondary">Non assigné</span>
+                <span th:if="${ticket.agent != null && ticket.agent.id != session.SPRING_SECURITY_CONTEXT.authentication.principal.id}"
+                      class="badge bg-info text-dark" th:text="${ticket.agent.username}">Autre agent</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5 th:text="${ticket.subject}" class="card-title">Sujet</h5>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <span th:text="${'Étudiant: ' + ticket.student.username}">Étudiant</span> |
+                            <span th:text="${'Créé le: ' + #temporals.format(ticket.creationDate, 'dd/MM/yyyy HH:mm')}">Date</span>
+                        </small>
+                    </p>
+                    <p class="card-text" th:if="${!ticket.messages.isEmpty()}" th:text="${ticket.messages[0].text.length() > 100 ? ticket.messages[0].text.substring(0, 100) + '...' : ticket.messages[0].text}">
+                        Aperçu du message...
+                    </p>
+                </div>
+                <div class="col-md-4 d-flex flex-column justify-content-center align-items-end">
+                    <div class="btn-group" role="group">
+                        <form method="post" th:action="@{'/ticket/' + ${ticket.id} + '/take'}" th:if="${ticket.status.name()} == 'ABERTO'">
+                            <button type="submit" class="btn btn-success me-2">Prendre en charge</button>
+                        </form>
+                        <a th:href="@{/ticket/{id}(id=${ticket.id})}" class="btn btn-primary">Détails</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

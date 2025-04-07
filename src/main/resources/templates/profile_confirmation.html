@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Confirmation</title>
+  <div th:replace="~{base :: head}"></div>
+  <style>
+    .confirmation-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px;
+        text-align: center;
+        background-color: var(--card-background);
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+    }
+    .check-icon {
+        font-size: 4rem;
+        color: var(--success-color);
+        margin-bottom: 1rem;
+    }
+    .countdown {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 20px 0;
+        color: var(--primary-color);
+    }
+  </style>
+</head>
+<header>
+  <!-- Utilisation d'un fragment conditionnel basé sur le rôle -->
+  <div th:if="${userRole == 'STUDENT'}" th:replace="~{base :: logo-al}"></div>
+  <div th:if="${userRole == 'AGENT'}" th:replace="~{base :: logo-ag}"></div>
+</header>
+<body>
+<div class="container mt-5">
+  <div class="confirmation-container">
+    <div class="check-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h1 class="mb-4">Modifications enregistrées</h1>
+    <p class="lead">Vos modifications de profil ont été enregistrées avec succès.</p>
+
+    <div class="countdown" id="countdown">5</div>
+
+    <p>Vous allez être redirigé vers votre profil dans <span id="seconds">5</span> secondes.</p>
+
+    <div class="mt-4">
+      <a th:if="${userRole == 'STUDENT'}" href="/student/profile" class="btn btn-primary">
+        <i class="fas fa-user me-2"></i>Retour au profil
+      </a>
+      <a th:if="${userRole == 'AGENT'}" href="/agent/profile" class="btn btn-primary">
+        <i class="fas fa-user me-2"></i>Retour au profil
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Compte à rebours et redirection
+  let seconds = 5;
+  const countdownDisplay = document.getElementById('countdown');
+  const secondsDisplay = document.getElementById('seconds');
+
+  const countdown = setInterval(function() {
+      seconds--;
+      countdownDisplay.textContent = seconds;
+      secondsDisplay.textContent = seconds;
+
+      if (seconds <= 0) {
+          clearInterval(countdown);
+          // Redirection selon le rôle
+          const userRole = '[[${userRole}]]';
+          if (userRole === 'STUDENT') {
+              window.location.href = '/student/profile';
+          } else if (userRole === 'AGENT') {
+              window.location.href = '/agent/profile';
+          }
+      }
+  }, 1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Ticket</title>
+    <div th:replace="~{base :: head}"></div>
+    <!-- Ajout de Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<style>
+    .botoes{
+        display: flex;
+        flex-direction: row;
+    }
+     html, body
+     {
+         padding: 0;
+         margin: 0;
+         height: 100%;
+     }
+     .message-attachments {
+         margin-top: 10px;
+         padding: 5px;
+         border-top: 1px solid #eee;
+     }
+     .attachment-item {
+         display: inline-block;
+         margin-right: 10px;
+         margin-bottom: 5px;
+         padding: 5px;
+         border: 1px solid #ddd;
+         border-radius: 4px;
+         background-color: #f9f9f9;
+     }
+     .attachment-icon {
+         margin-right: 5px;
+     }
+     .preview-image {
+         max-width: 200px;
+         max-height: 150px;
+         margin-top: 5px;
+         border: 1px solid #eee;
+         border-radius: 4px;
+     }
+     .file-upload-container {
+         margin-top: 10px;
+     }
+     .custom-file-upload {
+         border: 1px solid #ccc;
+         display: inline-block;
+         padding: 6px 12px;
+         cursor: pointer;
+         background-color: #f8f9fa;
+         border-radius: 4px;
+     }
+</style>
+
+<header>
+    <div th:replace="~{base :: logo-al}"></div>
+</header>
+<body>
+<div class="container" style="height: 100%">
+    <div class="overflow-auto d-flex flex-column-reverse" style="max-height:50%">
+        <div>
+            <div class="d-flex flex-column justify-content-end" th:each="message : ${ticket.messages}" style="width: 100%;">
+                <div th:classappend="${username} == ${message.author.getUsername()} ? 'align-self-end' : 'align-self-start'" class="card p-2 mt-2" style="width: 70%;">
+                    <div th:text="${message.text}" class="card-body">
+                        Un texte de message 1
+                    </div>
+
+                    <!-- Affichage des pièces jointes -->
+                    <div th:if="${!message.attachments.isEmpty()}" class="message-attachments">
+                        <div th:each="attachment : ${message.attachments}" class="attachment-item">
+                            <!-- Icône selon le type de fichier -->
+                            <span class="attachment-icon">
+                                    <i th:if="${attachment.image}" class="fas fa-image"></i>
+                                    <i th:if="${attachment.pdf}" class="fas fa-file-pdf"></i>
+                                    <i th:unless="${attachment.image || attachment.pdf}" class="fas fa-file"></i>
+                                </span>
+
+                            <!-- Lien de téléchargement -->
+                            <a th:href="@{/attachments/{id}/download(id=${attachment.id})}" th:text="${attachment.fileName}"></a>
+                            <span th:text="${#numbers.formatDecimal(attachment.fileSize / 1024, 0, 1) + ' KB'}"></span>
+
+                            <!-- Prévisualisation des images -->
+                            <div th:if="${attachment.image}">
+                                <img th:src="@{/attachments/{id}/view(id=${attachment.id})}" class="preview-image" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer text-muted small d-flex justify-content-between">
+                        <a th:text="${message.author.username}"></a>
+                        <a th:text="${#temporals.format(message.sendDate, 'dd-MM-yyyy HH:mm')}"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form th:if="${ticket.status.name()} != 'FINALIZADO'" th:action="@{'/ticket/' + ${ticket.id} + '/send'}" method="post" th:object="${message}" id="form-send" enctype="multipart/form-data">
+        <textarea th:field="*{text}" class="mt-2 form-control" style="width: 100%" placeholder="Écrivez votre message ici..."></textarea>
+
+        <!-- Upload de fichiers -->
+        <div class="file-upload-container mt-2">
+            <label class="custom-file-upload">
+                <i class="fas fa-paperclip"></i> Joindre des fichiers
+                <input type="file" name="files" multiple style="display:none;" id="file-upload" />
+            </label>
+            <span id="selected-files" class="ms-2"></span>
+        </div>
+
+        <div class="botoes mt-2">
+            <button class="btn btn-primary" type="submit">Répondre</button>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript pour afficher les noms des fichiers sélectionnés -->
+<script>
+    document.getElementById('file-upload').addEventListener('change', function() {
+        var fileList = Array.from(this.files).map(file => file.name).join(', ');
+        document.getElementById('selected-files').textContent = fileList;
+    });
+</script>
+</body>
+</html>
