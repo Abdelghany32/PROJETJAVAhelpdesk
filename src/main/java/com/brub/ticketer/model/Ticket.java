@@ -9,21 +9,28 @@ public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @ManyToOne
     @JoinColumn(name="student_id", nullable=false)
     private Student student;
+
     @ManyToOne
     @JoinColumn(name="agent_id")
     private Agent agent;
+
     @Enumerated(EnumType.STRING)
     private Status status;
+
     @Enumerated(EnumType.STRING)
-    private Priority priority = Priority.MOYEN; // Valeur par défaut : MOYEN
+    private Priority priority;
+
     private String subject;
     private LocalDateTime creationDate;
     private LocalDateTime closingDate;
+
     @OneToMany(mappedBy = "ticket")
     private List<Message> messages;
+
     @Enumerated(EnumType.STRING)
     private Sector sector;
 
@@ -35,16 +42,20 @@ public class Ticket {
         this.creationDate = LocalDateTime.now();
         this.status = Status.ABERTO;
         this.student = student;
-        this.priority = Priority.MOYEN;
     }
 
     public Ticket() {
         this.creationDate = LocalDateTime.now();
         this.status = Status.ABERTO;
-        this.priority = Priority.MOYEN;
     }
 
-    // Getters et setters existants...
+    public Sector getSector() {
+        return sector;
+    }
+
+    public void setSector(Sector sector) {
+        this.sector = sector;
+    }
 
     public Priority getPriority() {
         return priority;
@@ -52,15 +63,6 @@ public class Ticket {
 
     public void setPriority(Priority priority) {
         this.priority = priority;
-    }
-
-    // Reste des getters et setters...
-    public Sector getSector() {
-        return sector;
-    }
-
-    public void setSector(Sector sector) {
-        this.sector = sector;
     }
 
     public String getSubject() {

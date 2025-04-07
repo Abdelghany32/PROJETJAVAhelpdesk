@@ -1,50 +1,58 @@
 package com.brub.ticketer.model;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "attachments")
 public class Attachment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(nullable = false)
     private String fileName;
+
+    @Column(nullable = false)
     private String fileType;
-    private Long fileSize;
+
+    @Column(nullable = false)
+    private long fileSize;
+
+    @Lob
+    private byte[] data;
+
+    @Column
     private String filePath;
-    private LocalDateTime uploadDate;
-    
+
     @ManyToOne
     @JoinColumn(name = "message_id")
     private Message message;
-    
-    @Lob
-    private byte[] data;
-    
-    public Attachment() {
-        this.uploadDate = LocalDateTime.now();
-    }
-    
-    public Attachment(String fileName, String fileType, Long fileSize) {
+
+    // Constructeurs
+    public Attachment() {}
+
+    // Constructeur pour stockage en base de données
+    public Attachment(String fileName, String fileType, long fileSize, byte[] data) {
         this.fileName = fileName;
         this.fileType = fileType;
         this.fileSize = fileSize;
-        this.uploadDate = LocalDateTime.now();
-    }
-
-    // Pour les petits fichiers qui peuvent être stockés directement en base de données
-    public Attachment(String fileName, String fileType, Long fileSize, byte[] data) {
-        this(fileName, fileType, fileSize);
         this.data = data;
     }
-    
-    // Pour les grands fichiers qui sont stockés sur le système de fichiers
-    public Attachment(String fileName, String fileType, Long fileSize, String filePath) {
-        this(fileName, fileType, fileSize);
+
+    // Constructeur pour stockage sur système de fichiers
+    public Attachment(String fileName, String fileType, long fileSize, String filePath) {
+        this.fileName = fileName;
+        this.fileType = fileType;
+        this.fileSize = fileSize;
         this.filePath = filePath;
     }
 
+    // Méthodes pour vérifier le mode de stockage
+    public boolean isStoredInDatabase() {
+        return data != null && data.length > 0;
+    }
+
+    // Getters et Setters
     public Long getId() {
         return id;
     }
@@ -69,12 +77,20 @@ public class Attachment {
         this.fileType = fileType;
     }
 
-    public Long getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(Long fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 
     public String getFilePath() {
@@ -85,14 +101,6 @@ public class Attachment {
         this.filePath = filePath;
     }
 
-    public LocalDateTime getUploadDate() {
-        return uploadDate;
-    }
-
-    public void setUploadDate(LocalDateTime uploadDate) {
-        this.uploadDate = uploadDate;
-    }
-
     public Message getMessage() {
         return message;
     }
@@ -101,31 +109,16 @@ public class Attachment {
         this.message = message;
     }
 
-    public byte[] getData() {
-        return data;
+    // Méthodes helpers
+    public boolean isImage() {
+        return fileType != null && fileType.startsWith("image/");
     }
 
-    public void setData(byte[] data) {
-        this.data = data;
-    }
-    
-    public boolean isStoredInDatabase() {
-        return data != null && data.length > 0;
-    }
-    
-    public String getFileExtension() {
-        if (fileName == null || !fileName.contains(".")) {
-            return "";
-        }
-        return fileName.substring(fileName.lastIndexOf(".") + 1);
-    }
-    
-    public boolean isImage() {
-        String ext = getFileExtension().toLowerCase();
-        return ext.equals("jpg") || ext.equals("jpeg") || ext.equals("png") || ext.equals("gif") || ext.equals("bmp");
-    }
-    
     public boolean isPdf() {
-        return getFileExtension().toLowerCase().equals("pdf");
+        return fileType != null && fileType.equals("application/pdf");
     }
+
+
+
+
 }

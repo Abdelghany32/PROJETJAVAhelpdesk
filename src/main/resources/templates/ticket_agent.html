@@ -6,48 +6,110 @@
     <div th:replace="~{base :: head}"></div>
 </head>
 <style>
-    .botoes{
+    .botoes {
         display: flex;
         flex-direction: row;
     }
-    html, body
-    {
+    html, body {
         padding: 0;
         margin: 0;
         height: 100%;
+    }
+    .file-upload-container {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+    }
+    .file-list {
+        margin-left: 10px;
+        color: #666;
     }
 </style>
 <header>
     <div th:replace="~{base :: logo-ag}"></div>
 </header>
 <body>
+<div class="container" style="height: 100%">
+    <div class="overflow-auto d-flex flex-column-reverse" style="max-height:50%">
+        <div>
+            <div class="d-flex flex-column justify-content-end" th:each="message : ${ticket.messages}" style="width: 100%;">
+                <div th:classappend="${username} == ${message.author.getUsername()} ? 'align-self-end' : 'align-self-start'" class="card p-2 mt-2" style="width: 70%;">
+                    <div th:text="${message.text}" class="card-body">
+                        Message
+                    </div>
 
-    <div class="container" style="height: 100%">
-        <div class="overflow-auto d-flex flex-column-reverse" style="max-height:50%">
-            <div>
-                <div class="d-flex flex-column justify-content-end" th:each="message : ${ticket.messages}" style="width: 100%;">
-                    <div th:classappend="${username} == ${message.author.getUsername()} ? 'align-self-end : align-self-start'" class="card p-2 mt-2" style="width: 70%;">
-                            <div th:text="${message.text}" class="card-body">
-                                Um texto de mensagem 1
-                            </div>
-                            <div class="card-footer text-muted small d-flex justify-content-between">
-                                <a th:text="${message.author.username}"></a>
-                                <a th:text="${#temporals.format(message.sendDate, 'dd-MM-yyyy HH:mm')}"></a>
-                            </div>
+                    <!-- Affichage des pièces jointes -->
+                    <div th:if="${not #lists.isEmpty(message.attachments)}" class="message-attachments mt-2">
+                        <div th:each="attachment : ${message.attachments}" class="attachment-item">
+                            <a th:href="@{/ticket/attachments/{id}/download(id=${attachment.id})}"
+                               class="text-decoration-none">
+                                <i th:if="${attachment.image}" class="fas fa-image text-primary me-2"></i>
+                                <i th:if="${attachment.pdf}" class="fas fa-file-pdf text-danger me-2"></i>
+                                <i th:unless="${attachment.image or attachment.pdf}" class="fas fa-file text-secondary me-2"></i>
+                                <span th:text="${attachment.fileName}"></span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-footer text-muted small d-flex justify-content-between">
+                        <a th:text="${message.author.username}"></a>
+                        <a th:text="${#temporals.format(message.sendDate, 'dd-MM-yyyy HH:mm')}"></a>
                     </div>
                 </div>
             </div>
         </div>
-            <form th:action="@{'/ticket/' + ${ticket.id} + '/send'}" method="post" th:object="${message}" id="form-send">
-                <textarea th:if="${ticket.status.name()} != 'FINALIZADO'" th:field="*{text}" class="mt-2" style="width: 50%" >Escreva aqui sua mensagem...</textarea>
-            </form>
-            <div class="botoes">
-                <button sec:authorize="hasRole('ADMIN')" th:if="${ticket.status.name()} != 'FINALIZADO'" th:onclick="document.querySelector('#form-send').submit()" class="btn btn-primary" id="responder">Responder</button>
-                <button th:onclick="document.querySelector('#form-close').submit()"
-                        th:if="${ticket.status.name()} != 'FINALIZADO'"
-                        class="btn btn-danger" sec:authorize="hasRole('ADMIN')" id="finalizar" style="margin-left:6px">Finalizar</button>
-                <form id="form-close" th:action="@{'/ticket/' + ${ticket.id} + '/close'}" method="post"></form>
-            </div>
     </div>
+
+    <form th:action="@{'/ticket/' + ${ticket.id} + '/send'}"
+          method="post"
+          th:object="${message}"
+          id="form-send"
+          enctype="multipart/form-data">
+            <textarea th:if="${ticket.status.name()} != 'FINALIZADO'"
+                      th:field="*{text}"
+                      class="mt-2 form-control"
+                      placeholder="Écrivez votre message ici..."></textarea>
+
+        <!-- Champ pour les pièces jointes -->
+        <div class="file-upload-container">
+            <label class="btn btn-outline-secondary btn-sm">
+                <input type="file" name="files" multiple style="display: none;" onchange="updateFileList(this)">
+                <i class="fas fa-paperclip me-2"></i>Joindre des fichiers
+            </label>
+            <span id="file-list" class="file-list"></span>
+        </div>
+    </form>
+
+    <div class="botoes mt-2">
+        <button sec:authorize="hasRole('ADMIN')"
+                th:if="${ticket.status.name()} != 'FINALIZADO'"
+                onclick="document.querySelector('#form-send').submit()"
+                class="btn btn-primary"
+                id="responder">Répondre</button>
+
+        <button th:onclick="document.querySelector('#form-close').submit()"
+                th:if="${ticket.status.name()} != 'FINALIZADO'"
+                class="btn btn-danger"
+                sec:authorize="hasRole('ADMIN')"
+                id="finalizar"
+                style="margin-left:6px">Finaliser</button>
+
+        <form id="form-close" th:action="@{'/ticket/' + ${ticket.id} + '/close'}" method="post"></form>
+    </div>
+</div>
+
+<script>
+    function updateFileList(input) {
+        const fileList = document.getElementById('file-list');
+        fileList.innerHTML = '';
+
+        if (input.files.length > 0) {
+            const fileNames = Array.from(input.files)
+                .map(file => file.name)
+                .join(', ');
+            fileList.textContent = fileNames;
+        }
+    }
+</script>
 </body>
 </html>

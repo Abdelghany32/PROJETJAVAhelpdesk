@@ -11,19 +11,22 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    
     @ManyToOne
     @JoinColumn(name = "author_id")
-    private User author;
+    private com.brub.ticketer.model.User author;
+    
     @ManyToOne
     @JoinColumn(name="ticket_id")
     private Ticket ticket;
+    
     @NotBlank
     private String text;
+    
     private LocalDateTime sendDate;
 
     @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Attachment> attachments = new ArrayList<>();
-
+    private List<Attachment> attachments;
 
     public Message(User author, Ticket ticket, String text) {
         this.author = author;
@@ -86,16 +89,18 @@ public class Message {
     }
 
     public void addAttachment(Attachment attachment) {
-        attachments.add(attachment);
+        if (this.attachments == null) {
+            this.attachments = new ArrayList<>();
+        }
+        this.attachments.add(attachment);
         attachment.setMessage(this);
     }
 
     public void removeAttachment(Attachment attachment) {
-        attachments.remove(attachment);
-        attachment.setMessage(null);
-    }
-
-    public boolean hasAttachments() {
-        return attachments != null && !attachments.isEmpty();
+        if (this.attachments != null) {
+            this.attachments.remove(attachment);
+            attachment.setMessage(null);
+        }
     }
 }
+

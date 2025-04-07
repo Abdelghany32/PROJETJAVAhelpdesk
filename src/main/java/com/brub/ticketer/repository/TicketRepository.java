@@ -17,6 +17,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByStudentId(long studentId);
     List<Ticket> findByStatusAndStudentId(Status status, Long id);
     List<Ticket> findByAgentIdAndSector(long id, Sector sector);
+    List<Ticket> findByAgentIdAndSectorOrderByCreationDateDesc(long id, Sector sector);
+    List<Ticket> findBySectorAndAgentIdNot(Sector sector, long agentId);
     // Trouver tous les tickets d'un secteur avec un statut spécifique
     List<Ticket> findByStatusAndSector(Status status, Sector sector);
     List<Ticket> findByPriorityAndStudentId(Priority priority, Long id);

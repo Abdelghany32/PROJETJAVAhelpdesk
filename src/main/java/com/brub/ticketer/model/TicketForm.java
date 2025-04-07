@@ -5,10 +5,15 @@ import javax.validation.constraints.NotBlank;
 public class TicketForm {
     @NotBlank
     private String subject;
+
     @NotBlank
     private String message;
+
+    @NotBlank
     private String sector;
-    private String priority = "MOYEN"; // Priorité par défaut
+
+    @NotBlank
+    private String priority;
 
     public TicketForm(){}
 

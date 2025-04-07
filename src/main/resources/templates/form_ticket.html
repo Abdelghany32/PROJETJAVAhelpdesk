@@ -14,7 +14,7 @@
     <div class="jumbotron jumbotron-fluid">
         <h1 class="display-5">Nouveau Ticket</h1>
     </div>
-    <form  th:object="${ticket}" method="post" class="ticket-form" th:action="@{/ticket/save_ticket}">
+    <form th:object="${ticket}" method="post" class="ticket-form" th:action="@{/ticket/save_ticket}" enctype="multipart/form-data">
         <div class="form-group">
             <label for="subject">Titre</label>
             <input type="text" th:errorclass="is-invalid" class="form-control" th:field="*{subject}" id="subject" aria-describedby="emailHelp" placeholder="Titre">
@@ -47,6 +47,11 @@
                     </option>
                 </select>
             </div>
+        </div>
+        <div class="form-group mt-3">
+            <label for="files">Pièces jointes</label>
+            <input type="file" class="form-control" id="files" name="files" multiple>
+            <small class="form-text text-muted">Vous pouvez sélectionner plusieurs fichiers. Taille maximale : 10 Mo par fichier.</small>
         </div>
         <button type="submit" class="btn btn-primary mt-3">Soumettre</button>
     </form>
