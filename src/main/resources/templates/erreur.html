@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="~{base :: head}"></div>
+    <title>Error - Resolve Here</title>
+    <style>
+        .error-container {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .error-code {
+            font-size: 8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0;
+            line-height: 1;
+            opacity: 0.5;
+        }
+
+        .error-icon {
+            font-size: 5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .error-message {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .error-details {
+            margin-bottom: 2rem;
+            color: var(--gray-color);
+        }
+
+        .error-actions {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<header>
+    <div th:replace="~{base :: logo-no-logout}"></div>
+</header>
+<body>
+<div class="container">
+    <div class="error-container animate-fade-in">
+        <div class="error-code" th:text="${status}">500</div>
+        <div class="error-icon">
+            <i class="fas" th:classappend="${status == 404} ? 'fa-map-signs' : (${status == 403} ? 'fa-lock' : 'fa-exclamation-circle')"></i>
+        </div>
+        <h1 class="error-message" th:text="${error}">Error</h1>
+        <p class="error-details" th:text="${message}">An error occurred while processing your request.</p>
+
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary btn-lg">
+                <i class="fas fa-home me-2"></i>Back to home page
+            </a>
+            <button onclick="window.history.back()" class="btn btn-outline-secondary btn-lg ms-3">
+                <i class="fas fa-arrow-left me-2"></i>Go back
+            </button>
+        </div>
+
+        <div class="mt-5" th:if="${trace != null}">
+            <p class="text-start">
+                <a class="btn btn-outline-danger btn-sm" data-bs-toggle="collapse" href="#errorDetails" role="button" aria-expanded="false" aria-controls="errorDetails">
+                    <i class="fas fa-bug me-2"></i>Technical details
+                </a>
+            </p>
+            <div class="collapse" id="errorDetails">
+                <div class="card card-body text-start">
+                    <pre class="text-danger" th:text="${trace}">Trace</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
