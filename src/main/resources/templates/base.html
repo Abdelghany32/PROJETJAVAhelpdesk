@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <div th:fragment="head">
 	<meta charset="UTF-8"/>
@@ -17,95 +18,53 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
 			integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
 			crossorigin="anonymous"></script>
-	<!-- Dans votre head, remplacez par : -->
+
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('theme-toggle');
+            // Fonction pour appliquer le thème
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            }
 
-    function applyTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-        console.log('Thème changé en:', theme); // Pour le débogage
-    }
+            // Initialisation du thème
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-    function toggleTheme() {
-        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        applyTheme(newTheme);
-    }
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else if (prefersDark) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
 
-    // Initialisation
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (savedTheme) {
-        applyTheme(savedTheme);
-    } else if (prefersDark) {
-        applyTheme('dark');
-    }
-
-    // Écouteur d'événement
-    if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-        console.log('Bouton trouvé et écouteur ajouté'); // Pour le débogage
-    } else {
-        console.error('Bouton theme-toggle non trouvé');
-    }
-});
+            // Basculer le thème lorsque le bouton est cliqué
+            const toggleButtons = document.querySelectorAll('.theme-toggle');
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    applyTheme(newTheme);
+                });
+            });
+        });
 	</script>
 </div>
 
-<style>
-	/* Style pour le bouton theme toggle */
-    #theme-toggle {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.3s ease;
-        margin-right: 10px;
-    }
-
-    #theme-toggle:hover {
-        transform: scale(1.1);
-    }
-
-    /* Gestion des icônes selon le thème */
-    [data-theme="dark"] #theme-toggle .fa-moon {
-        display: none;
-    }
-
-    [data-theme="dark"] #theme-toggle .fa-sun {
-        display: inline-block;
-        color: #FFD700; /* Couleur or pour le soleil */
-    }
-
-    [data-theme="light"] #theme-toggle .fa-sun {
-        display: none;
-    }
-
-    [data-theme="light"] #theme-toggle .fa-moon {
-        display: inline-block;
-        color: #2c3e50; /* Couleur sombre pour la lune */
-    }
-</style>
-
 <div th:fragment="logo-al" class="logo-container mb-3 p-3 d-flex justify-content-between align-items-center">
-	<span class="logo"><a href="/student/dashboard">Resolve Aqui</a></span>
-	<div class="d-flex align-items-center">
-		<!-- Bouton dark/light mode ajouté ici -->
-		<button id="theme-toggle" class="btn btn-outline-light">
+	<span class="logo"><a href="/">solve here</a></span>	<div class="d-flex align-items-center">
+		<!-- Bouton dark/light mode -->
+		<button class="btn btn-outline-light theme-toggle me-3">
 			<i class="fas fa-moon"></i>
 			<i class="fas fa-sun" style="display: none;"></i>
 		</button>
 
-		<div class="dropdown me-3">
-			<button class="btn btn-outline-light dropdown-toggle" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+		<div class="dropdown">
+			<button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdownStudent" data-bs-toggle="dropdown" aria-expanded="false">
 				<i class="fas fa-user me-2"></i><span sec:authentication="name">Utilisateur</span>
 			</button>
-			<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
+			<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdownStudent">
 				<li><a class="dropdown-item" href="/student/profile"><i class="fas fa-id-card me-2"></i>Mon profil</a></li>
 				<li><a class="dropdown-item" href="/student/settings"><i class="fas fa-cog me-2"></i>Paramètres</a></li>
 				<li><hr class="dropdown-divider"></li>
@@ -120,19 +79,19 @@
 </div>
 
 <div th:fragment="logo-ag" class="logo-container mb-3 p-3 d-flex justify-content-between align-items-center">
-	<span class="logo"><a href="/agent/dashboard">Resolve Aqui</a></span>
+	<span class="logo"><a href="/agent/dashboard">solve here</a></span>
 	<div class="d-flex align-items-center">
-		<!-- Bouton dark/light mode ajouté ici -->
-		<button id="theme-toggle" class="btn btn-outline-light" aria-label="Toggle theme">
+		<!-- Bouton dark/light mode -->
+		<button class="btn btn-outline-light theme-toggle me-3">
 			<i class="fas fa-moon"></i>
 			<i class="fas fa-sun" style="display: none;"></i>
 		</button>
 
-		<div class="dropdown me-3">
-			<button class="btn btn-outline-light dropdown-toggle" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+		<div class="dropdown">
+			<button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdownAgent" data-bs-toggle="dropdown" aria-expanded="false">
 				<i class="fas fa-user me-2"></i><span sec:authentication="name">Utilisateur</span>
 			</button>
-			<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
+			<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdownAgent">
 				<li><a class="dropdown-item" href="/agent/profile"><i class="fas fa-id-card me-2"></i>Mon profil</a></li>
 				<li><a class="dropdown-item" href="/agent/settings"><i class="fas fa-cog me-2"></i>Paramètres</a></li>
 				<li><hr class="dropdown-divider"></li>
@@ -147,9 +106,167 @@
 </div>
 
 <div th:fragment="logo-no-logout" class="logo-container mb-3 p-3 d-flex justify-content-between align-items-center">
-	<span class="logo">Resolve Aqui</span>
+	<span class="logo">solve here</span>
 	<div>
-		<a href="/student/login" class="btn btn-outline-light me-2"><i class="fas fa-user me-1"></i> Étudiant</a>
-		<a href="/agent/login" class="btn btn-outline-light"><i class="fas fa-headset me-1"></i> Agent</a>
+		<!-- Bouton dark/light mode -->
+		<button class="btn btn-outline-light theme-toggle me-3">
+			<i class="fas fa-moon"></i>
+			<i class="fas fa-sun" style="display: none;"></i>
+		</button>
+
+		<a href="/student/login" class="btn btn-outline-light me-2"><i class="fas fa-user-graduate me-1"></i>Étudiant</a>
+		<a href="/agent/login" class="btn btn-outline-light"><i class="fas fa-headset me-1"></i>Agent</a>
 	</div>
 </div>
+
+<style>
+	/* Variables CSS pour le mode clair/sombre */
+	:root {
+		--primary-color: #6366f1;
+		--primary-dark: #4f46e5;
+		--secondary-color: #8b5cf6;
+		--gray-color: #6b7280;
+		--text-color: #1f2937;
+		--background-color: #f9fafb;
+		--card-background: #ffffff;
+		--border-color: #e5e7eb;
+		--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+		--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+		--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+		--warning-color: #f59e0b;
+		--success-color: #10b981;
+		--danger-color: #dc3545;
+		--info-color: #3b82f6;
+		--dark-color: #1f2937;
+		--light-color: #f3f4f6;
+		--primary-color-rgb: 99, 102, 241;
+	}
+
+	[data-theme="dark"] {
+		--primary-color: #6366f1;
+		--primary-dark: #4f46e5;
+		--secondary-color: #8b5cf6;
+		--gray-color: #9ca3af;
+		--text-color: #f9fafb;
+		--background-color: #1f2937;
+		--card-background: #111827;
+		--border-color: #374151;
+		--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+		--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+		--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+	}
+
+	/* Appliquer les variables aux éléments */
+	body {
+		background-color: var(--background-color);
+		color: var(--text-color);
+		font-family: 'Roboto', sans-serif;
+		transition: all 0.3s ease;
+	}
+
+	/* Style pour le logo container */
+    .logo-container {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        border-radius: 0 0 12px 12px;
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Style pour le logo */
+    .logo {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    .logo a {
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .logo a:hover {
+        opacity: 0.9;
+    }
+
+    /* Style pour les boutons */
+    .btn-outline-light {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-light:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Thème sombre */
+    [data-theme="dark"] .theme-toggle .fa-moon {
+        display: none;
+    }
+
+    [data-theme="dark"] .theme-toggle .fa-sun {
+        display: inline-block !important;
+    }
+
+    /* Thème clair */
+    [data-theme="light"] .theme-toggle .fa-sun {
+        display: none !important;
+    }
+
+    [data-theme="light"] .theme-toggle .fa-moon {
+        display: inline-block;
+    }
+
+    /* Style pour le dropdown */
+    .dropdown-menu {
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+        padding: 0.5rem;
+        background-color: var(--card-background);
+        border-color: var(--border-color);
+    }
+
+    .dropdown-item {
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+        color: var(--text-color);
+    }
+
+    .dropdown-item:hover {
+        background-color: rgba(var(--primary-color-rgb), 0.1);
+        transform: translateX(5px);
+    }
+
+    /* Style pour le séparateur de dropdown */
+    .dropdown-divider {
+        border-top-color: var(--border-color);
+    }
+
+    /* Animation pour les éléments apparaissant */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Animation pour le flottement */
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    /* Animation pour le pulse des indicateurs de statut */
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.5); }
+        70% { box-shadow: 0 0 0 10px rgba(var(--primary-color-rgb), 0); }
+        100% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0); }
+    }
+</style>
+</html>

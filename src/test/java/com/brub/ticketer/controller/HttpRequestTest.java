@@ -79,13 +79,13 @@ public class HttpRequestTest {
 		if(!setUpIsDone) {
 			Ticket ticket = new Ticket();
 			ticket.setSubject("problema");
-			ticket.setSector(Sector.FINANCEIRO);
+			ticket.setSector(Sector.FINANCIAL);
 			Student student = new Student("testevaldo", encoder.encode("12345"), "testevaldo@test.com", "20178955");
 			Role userRole = roleRepository.findByName("ROLE_USER");
 			student.setRoles(Arrays.asList(userRole));
 			studentRepository.save(student);
 			userRole = roleRepository.findByName("ROLE_ADMIN");
-			Agent agent = new Agent("Ed", "12345", "ed@ra.com", Sector.FINANCEIRO);
+			Agent agent = new Agent("Ed", "12345", "ed@ra.com", Sector.FINANCIAL);
 			agent.setRoles(Arrays.asList(userRole));
 			agent.setTickets(Arrays.asList(ticket));
 			agentRepository.save(agent);
@@ -108,7 +108,7 @@ public class HttpRequestTest {
 	@Test
 	@WithUserDetails("ed@ra.com")
 	public void agentDashboardReturnsTicketSubject_thenSuccess() throws Exception {
-		this.mockMvc.perform(get("/agent/dashboard/aberto"))
+		this.mockMvc.perform(get("/agent/dashboard/OPEN"))
 				.andExpect(content().string(containsString("problema")))
 				.andExpect(status().isOk())
 				.andExpect(MockMvcResultMatchers.view().name("dashboard_agent"));

@@ -1,50 +1,296 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:attr="data-theme='light'">
 <head>
-    <title>Dashboard</title>
+    <title>Tableau de Bord Étudiant</title>
     <div th:replace="~{base :: head}"></div>
+    <style>
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            z-index: 1;
+        }
+
+        .dashboard-header h1 {
+            font-weight: 700;
+            margin-bottom: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dashboard-header .user-info {
+            position: relative;
+            z-index: 2;
+            line-height: 1.6;
+        }
+
+        .dashboard-nav {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+            overflow: hidden;
+        }
+
+        .ticket-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            animation: fadeIn 0.8s ease-out 0.4s both;
+        }
+
+        .ticket-card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+        }
+
+        .ticket-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .ticket-header {
+            padding: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .ticket-header.status-open {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .ticket-header.status-progress {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .ticket-header.status-closed {
+            background-color: rgba(31, 41, 55, 0.1);
+            border-left: 4px solid var(--dark-color);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-open .status-indicator {
+            background-color: var(--warning-color);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .status-progress .status-indicator {
+            background-color: var(--success-color);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+
+        .status-closed .status-indicator {
+            background-color: var(--dark-color);
+            box-shadow: 0 0 0 2px rgba(31, 41, 55, 0.2);
+        }
+
+        .ticket-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ticket-subject {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .ticket-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .ticket-date {
+            font-size: 0.875rem;
+            color: var(--gray-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            color: var(--gray-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .create-ticket-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .create-ticket-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .create-ticket-btn i {
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .ticket-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <header id="oi">
     <div th:replace="~{base :: logo-al}"></div>
 </header>
 <body>
 <div class="container">
-    <div class="jumbotron jumbotron-fluid d-flex justify-content-between align-content-end">
-        <h1 class="display-4">Tickets</h1>
+    <!-- En-tête du tableau de bord -->
+    <div class="dashboard-header d-flex justify-content-between align-items-center">
         <div>
-            <p th:text="'Étudiant: ' + ${nome}"></p>
-            <p th:text="'Matricule: ' + ${registration}"></p>
+            <h1 class="display-4">Mes Tickets</h1>
+            <p class="mb-0 opacity-75">Suivez l'état de vos demandes</p>
+        </div>
+        <div class="user-info text-end">
+            <p class="mb-1"><strong>Étudiant:</strong> <span th:text="${nome}"></span></p>
+            <p class="mb-0"><strong>Matricule:</strong> <span th:text="${registration}"></span></p>
         </div>
     </div>
-    <nav class="navbar navbar-expand navbar-light bg-light d-flex justify-content-between mb-3 overflow-auto">
+
+    <!-- Navigation et filtres -->
+    <nav class="dashboard-nav navbar navbar-expand navbar-light d-flex justify-content-between mb-4 overflow-auto">
         <div class="navbar-nav">
-            <!-- Filtres simples par statut uniquement -->
-            <a th:classappend="${status} == null ? 'active'" class="nav-item nav-link" href="/student/dashboard">Tous</a>
-            <a th:classappend="${status} == 'ABERTO' ? 'active'" class="nav-item nav-link" href="/student/dashboard/aberto">Ouvert</a>
-            <a th:classappend="${status} == 'EM_ANDAMENTO' ? 'active'" class="nav-item nav-link" href="/student/dashboard/em_andamento">En cours</a>
-            <a th:classappend="${status} == 'FINALIZADO' ? 'active'" class="nav-item nav-link" href="/student/dashboard/finalizado">Terminé</a>
+            <a th:classappend="${status} == null ? 'active'" class="nav-item nav-link" href="/student/dashboard">
+                <i class="fas fa-border-all me-2"></i>Tous
+            </a>
+            <a th:classappend="${status} == 'ABERTO' ? 'active'" class="nav-item nav-link" href="/student/dashboard/aberto">
+                <i class="fas fa-clock me-2"></i>Ouverts
+            </a>
+            <a th:classappend="${status} == 'EM_ANDAMENTO' ? 'active'" class="nav-item nav-link" href="/student/dashboard/em_andamento">
+                <i class="fas fa-spinner me-2"></i>En cours
+            </a>
+            <a th:classappend="${status} == 'FINALIZADO' ? 'active'" class="nav-item nav-link" href="/student/dashboard/finalizado">
+                <i class="fas fa-check-circle me-2"></i>Terminés
+            </a>
         </div>
-        <a href="/ticket/form_ticket"><button class="btn btn-outline-secondary my-2 my-sm-0 mx-2">Nouveau</button></a>
+
+        <a href="/ticket/form_ticket" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Nouveau Ticket
+        </a>
     </nav>
-    <div th:each="ticket : ${tickets}" class="card mb-3">
-        <!-- En-tête du ticket -->
-        <div class="card-header d-flex justify-content-between align-items-center"
-             th:style="${ticket.priority != null} ? 'border-left: 5px solid ' + ${ticket.priority.getColorCode()} + ';' : ''"
-             th:classappend="${ticket.status.name()} == 'ABERTO' ? 'alert-warning' :
-                                    (${ticket.status.name()} == 'EM_ANDAMENTO' ? 'alert-success' : 'alert-dark')">
-            <span th:text="'Ticket #' + ${ticket.getId()}">Ticket</span>
-            <span th:if="${ticket.priority != null}" class="badge"
-                  th:style="'background-color: ' + ${ticket.priority.getColorCode()} + ';'"
-                  th:text="${ticket.priority}">Priorité</span>
+
+    <!-- Liste des tickets -->
+    <div th:if="${tickets.isEmpty()}" class="empty-state">
+        <div class="empty-state-icon">
+            <i class="fas fa-ticket-alt"></i>
         </div>
-        <div class="card-body">
-            <div class="d-flex mb-3 flex-wrap justify-content-md-between">
-                <div th:text="${'Sujet: ' + ticket.subject}" class="descricao">Sujet: </div>
-                <div th:text="${'Date: ' + ticket.creationDate}" class="data">Date: </div>
-                <a th:href="@{/ticket/{id}(id=${ticket.id})}"><button type="button" class="btn btn-primary">Accéder</button></a>
+        <h3>Aucun ticket trouvé</h3>
+        <p class="text-muted">Vous n'avez pas encore de tickets dans cette catégorie.</p>
+        <a href="/ticket/form_ticket" class="btn btn-primary mt-3">
+            <i class="fas fa-plus me-2"></i>Créer un nouveau ticket
+        </a>
+    </div>
+
+    <div th:unless="${tickets.isEmpty()}" class="ticket-list">
+        <div th:each="ticket : ${tickets}" class="ticket-card animate-fade-in">
+            <div th:switch="${ticket.status.name()}" class="ticket-header"
+                 th:classappend="${ticket.status.name() == 'ABERTO' ? 'status-open' : (ticket.status.name() == 'EM_ANDAMENTO' ? 'status-progress' : 'status-closed')}">
+                <span class="status-indicator"></span>
+                <span th:text="'Ticket #' + ${ticket.getId()}"></span>
+            </div>
+            <div class="ticket-body">
+                <div class="ticket-subject" th:text="${ticket.subject}"></div>
+                <div class="ticket-sector" th:if="${ticket.sector != null}">
+                    <span class="badge bg-secondary" th:text="${ticket.sector}"></span>
+                </div>
+                <div class="ticket-details">
+                    <div class="ticket-date" th:text="${#temporals.format(ticket.creationDate, 'dd MMM yyyy')}"></div>
+                    <a th:href="@{/ticket/{id}(id=${ticket.id})}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>Voir
+                    </a>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Bouton flottant pour créer un ticket (mobile) -->
+    <a href="/ticket/form_ticket" class="create-ticket-btn d-md-none">
+        <i class="fas fa-plus"></i>
+    </a>
 </div>
+
+<script>
+    // Animation au défilement
+    document.addEventListener('DOMContentLoaded', function() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.ticket-card').forEach(card => {
+            observer.observe(card);
+        });
+    });
+</script>
 </body>
 </html>

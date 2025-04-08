@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:attr="data-server-theme='light'">
+<head>
+  <title>Contact - Ticketer</title>
+  <div th:replace="~{base :: head}"></div>
+  <style>
+    .contact-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        border-radius: 12px;
+        padding: 3rem 2rem;
+        margin-bottom: 3rem;
+        color: white;
+        box-shadow: var(--shadow-md);
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    .contact-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+        z-index: 1;
+    }
+
+    .contact-header h1 {
+        font-weight: 800;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .contact-header p {
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin: 0 auto;
+        opacity: 0.9;
+        position: relative;
+        z-index: 2;
+    }
+
+    .contact-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .contact-form-container {
+        flex: 1;
+        min-width: 300px;
+        animation: slideInLeft 0.8s ease-out;
+    }
+
+    .contact-info-container {
+        flex: 1;
+        min-width: 300px;
+        animation: slideInRight 0.8s ease-out;
+    }
+
+    .contact-card {
+        background-color: var(--card-background);
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        padding: 2rem;
+        height: 100%;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    .contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .contact-card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-color);
+        position: relative;
+        padding-bottom: 0.75rem;
+    }
+
+    .contact-card-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background-color: var(--primary-color);
+        border-radius: 3px;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border: 2px solid var(--border-color);
+        background-color: var(--background-color);
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+        transform: translateY(-2px);
+        outline: none;
+    }
+
+    .btn-submit {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        background-color: var(--primary-light);
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-submit i {
+        margin-right: 0.5rem;
+    }
+
+    .contact-info-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .contact-info-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+
+    .contact-info-icon {
+        width: 50px;
+        height: 50px;
+        background-color: rgba(99, 102, 241, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: var(--primary-color);
+        font-size: 1.25rem;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .contact-info-item:hover .contact-info-icon {
+        background-color: var(--primary-color);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .contact-info-content {
+        flex: 1;
+    }
+
+    .contact-info-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+    }
+
+    .contact-info-text {
+        color: var(--gray-color);
+        line-height: 1.6;
+    }
+
+    .contact-info-text a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .contact-info-text a:hover {
+        text-decoration: underline;
+    }
+
+    .map-container {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        margin-top: 3rem;
+        height: 400px;
+        animation: fadeIn 0.8s ease-out 0.4s both;
+        border: 1px solid var(--border-color);
+    }
+
+    .map-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    .social-links {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .social-link {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--background-color);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-color);
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .social-link:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .contact-header {
+            padding: 2rem 1rem;
+        }
+
+        .contact-header h1 {
+            font-size: 2rem;
+        }
+
+        .contact-container {
+            flex-direction: column;
+        }
+
+        .map-container {
+            height: 300px;
+        }
+    }
+  </style>
+</head>
+<header>
+  <div th:replace="~{base :: logo-no-logout}"></div>
+</header>
+<body>
+<div class="container">
+  <div class="contact-header">
+    <h1>Contactez-nous</h1>
+    <p>Nous sommes là pour vous aider. N'hésitez pas à nous contacter pour toute question ou suggestion concernant notre plateforme.</p>
+  </div>
+
+  <div class="contact-container">
+    <div class="contact-form-container">
+      <div class="contact-card">
+        <h2 class="contact-card-title">Envoyez-nous un message</h2>
+
+        <form id="contact-form" action="/contact/send" method="post">
+          <div class="form-group">
+            <label for="name" class="form-label">Nom complet</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Votre nom complet" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Adresse email</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Votre adresse email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="subject" class="form-label">Sujet</label>
+            <input type="text" class="form-control" id="subject" name="subject" placeholder="Sujet de votre message" required>
+          </div>
+
+          <div class="form-group">
+            <label for="message" class="form-label">Message</label>
+            <textarea class="form-control" id="message" name="message" rows="5" placeholder="Votre message..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-submit">
+            <i class="fas fa-paper-plane"></i>Envoyer le message
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="contact-info-container">
+      <div class="contact-card">
+        <h2 class="contact-card-title">Informations de contact</h2>
+
+        <div class="contact-info-item">
+          <div class="contact-info-icon">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div class="contact-info-content">
+            <h3 class="contact-info-title">Adresse</h3>
+            <p class="contact-info-text">123 Avenue des Universités<br>75000 Paris, France</p>
+          </div>
+        </div>
+
+        <div class="contact-info-item">
+          <div class="contact-info-icon">
+            <i class="fas fa-phone-alt"></i>
+          </div>
+          <div class="contact-info-content">
+            <h3 class="contact-info-title">Téléphone</h3>
+            <p class="contact-info-text">
+              <a href="tel:+33123456789">+33 1 23 45 67 89</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="contact-info-item">
+          <div class="contact-info-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="contact-info-content">
+            <h3 class="contact-info-title">Email</h3>
+            <p class="contact-info-text">
+              <a href="mailto:contact@resolveaqui.com">contact@resolveaqui.com</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="contact-info-item">
+          <div class="contact-info-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="contact-info-content">
+            <h3 class="contact-info-title">Heures d'ouverture</h3>
+            <p class="contact-info-text">
+              Lundi - Vendredi: 9h00 - 18h00<br>
+              Samedi: 9h00 - 12h00<br>
+              Dimanche: Fermé
+            </p>
+          </div>
+        </div>
+
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Facebook">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#" class="social-link" aria-label="Twitter">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="social-link" aria-label="Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" class="social-link" aria-label="LinkedIn">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="map-container">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9916256937595!2d2.292292615509614!3d48.85837007928757!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e2964e34e2d%3A0x8ddca9ee380ef7e0!2sTour%20Eiffel!5e0!3m2!1sfr!2sfr!4v1649956092532!5m2!1sfr!2sfr" allowfullscreen="" loading="lazy"></iframe>
+  </div>
+</div>
+
+<script>
+  // Animation des éléments au défilement
+  document.addEventListener('DOMContentLoaded', function() {
+      const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                  entry.target.classList.add('animate-fade-in');
+              }
+          });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.contact-card, .map-container').forEach(element => {
+          observer.observe(element);
+      });
+
+      // Animation des champs de formulaire
+      const formControls = document.querySelectorAll('.form-control');
+      formControls.forEach((control, index) => {
+          control.style.opacity = '0';
+          control.style.transform = 'translateY(20px)';
+
+          setTimeout(() => {
+              control.style.transition = 'all 0.5s ease';
+              control.style.opacity = '1';
+              control.style.transform = 'translateY(0)';
+          }, 300 + (index * 150));
+      });
+
+      // Animation du bouton d'envoi
+      const submitButton = document.querySelector('.btn-submit');
+      submitButton.style.opacity = '0';
+      submitButton.style.transform = 'translateY(20px)';
+
+      setTimeout(() => {
+          submitButton.style.transition = 'all 0.5s ease';
+          submitButton.style.opacity = '1';
+          submitButton.style.transform = 'translateY(0)';
+      }, 300 + (formControls.length * 150));
+
+      // Animation des éléments d'information de contact
+      const infoItems = document.querySelectorAll('.contact-info-item');
+      infoItems.forEach((item, index) => {
+          item.style.opacity = '0';
+          item.style.transform = 'translateX(20px)';
+
+          setTimeout(() => {
+              item.style.transition = 'all 0.5s ease';
+              item.style.opacity = '1';
+              item.style.transform = 'translateX(0)';
+          }, 300 + (index * 150));
+      });
+
+      // Animation des liens sociaux
+      const socialLinks = document.querySelectorAll('.social-link');
+      socialLinks.forEach((link, index) => {
+          link.style.opacity = '0';
+          link.style.transform = 'translateY(20px)';
+
+          setTimeout(() => {
+              link.style.transition = 'all 0.5s ease';
+              link.style.opacity = '1';
+              link.style.transform = 'translateY(0)';
+          }, 900 + (index * 100));
+      });
+  });
+</script>
+</body>
+</html>

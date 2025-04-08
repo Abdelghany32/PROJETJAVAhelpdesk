@@ -1,60 +1,455 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:attr="data-theme='light'">
 <head>
-    <title>Dashboard Agent</title>
+    <title>Tableau de Bord Agent</title>
     <div th:replace="~{base :: head}"></div>
+    <style>
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            z-index: 1;
+        }
+
+        .dashboard-header h1 {
+            font-weight: 700;
+            margin-bottom: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dashboard-header .user-info {
+            position: relative;
+            z-index: 2;
+            line-height: 1.6;
+        }
+
+        .filters-card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filters-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filters-toggle {
+            background: none;
+            border: none;
+            color: var(--gray-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .filters-toggle:hover {
+            color: var(--primary-color);
+            transform: rotate(180deg);
+        }
+
+        .filters-body {
+            padding: 1.5rem;
+        }
+
+        .filter-section {
+            margin-bottom: 1rem;
+        }
+
+        .filter-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-link {
+            color: var(--gray-color);
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-link:hover {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .filter-link.active {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .ticket-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            animation: fadeIn 0.8s ease-out 0.4s both;
+        }
+
+        .ticket-card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .ticket-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .ticket-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .ticket-header.status-open {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .ticket-header.status-progress {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .ticket-header.status-closed {
+            background-color: rgba(31, 41, 55, 0.1);
+            border-left: 4px solid var(--dark-color);
+        }
+
+        .ticket-number {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-open .status-indicator {
+            background-color: var(--warning-color);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .status-progress .status-indicator {
+            background-color: var(--success-color);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+
+        .status-closed .status-indicator {
+            background-color: var(--dark-color);
+            box-shadow: 0 0 0 2px rgba(31, 41, 55, 0.2);
+        }
+
+        .ticket-badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .badge-custom {
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .badge-custom:hover {
+            transform: translateY(-2px);
+        }
+
+        .ticket-body {
+            padding: 1.5rem;
+        }
+
+        .ticket-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+        }
+
+        .ticket-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+
+        .ticket-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ticket-message {
+            background-color: var(--background-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            color: var(--text-color);
+            position: relative;
+        }
+
+        .ticket-message::after {
+            content: '"';
+            position: absolute;
+            top: 0;
+            right: 0.5rem;
+            font-size: 2rem;
+            color: var(--border-color);
+            font-family: cursive;
+        }
+
+        .ticket-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-assign {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-assign:hover {
+            background-color: #0e9f6e;
+        }
+
+        .btn-view {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-view:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            color: var(--gray-color);
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .filters-body .row {
+                flex-direction: column;
+            }
+
+            .ticket-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .ticket-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <header>
     <div th:replace="~{base :: logo-ag}"></div>
 </header>
 <body>
 <div class="container">
-    <div class="jumbotron jumbotron-fluid d-flex justify-content-between align-content-end">
-        <h1 class="display-4">Gestion des Tickets</h1>
+    <!-- En-tête du tableau de bord -->
+    <div class="dashboard-header d-flex justify-content-between align-items-center">
         <div>
-            <p th:text="'Agent: ' + ${nome}"></p>
-            <p th:text="'Secteur: ' + ${sector}"></p>
+            <h1 class="display-4">Gestion des Tickets</h1>
+            <p class="mb-0 opacity-75">Traitez les demandes des étudiants</p>
+        </div>
+        <div class="user-info text-end">
+            <p class="mb-1"><strong>Agent:</strong> <span th:text="${nome}"></span></p>
+            <p class="mb-0"><strong>Secteur:</strong> <span th:text="${sector}"></span></p>
         </div>
     </div>
 
-    <!-- Filtres avancés -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5>Filtres</h5>
+    <!-- Filtres -->
+    <div class="filters-card">
+        <div class="filters-header">
+            <div class="filters-title">
+                <i class="fas fa-filter"></i>
+                <span>Filtres</span>
+            </div>
+            <button class="filters-toggle" onclick="toggleFilters()">
+                <i class="fas fa-chevron-down" id="filters-icon"></i>
+            </button>
         </div>
-        <div class="card-body">
+        <div class="filters-body" id="filters-body">
             <div class="row">
                 <!-- Statut -->
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Par statut</label>
-                    <div class="d-flex flex-column">
-                        <a th:classappend="${status} == null ? 'active fw-bold'" class="nav-link py-1" href="/agent/dashboard">Tous</a>
-                        <a th:classappend="${status} == 'ABERTO' ? 'active fw-bold'" class="nav-link py-1" href="/agent/dashboard/aberto">Ouverts</a>
-                        <a th:classappend="${status} == 'EM_ANDAMENTO' ? 'active fw-bold'" class="nav-link py-1" href="/agent/dashboard/em_andamento">En cours</a>
-                        <a th:classappend="${status} == 'FINALIZADO' ? 'active fw-bold'" class="nav-link py-1" href="/agent/dashboard/finalizado">Terminés</a>
+                <div class="col-md-4 mb-3 filter-section">
+                    <div class="filter-title">
+                        <i class="fas fa-tasks"></i>
+                        <span>Par statut</span>
+                    </div>
+                    <div class="filter-links">
+                        <a th:classappend="${status} == null ? 'active'" class="filter-link" href="/agent/dashboard">
+                            <i class="fas fa-border-all"></i>
+                            <span>Tous</span>
+                        </a>
+                        <a th:classappend="${status} == 'ABERTO' ? 'active'" class="filter-link" href="/agent/dashboard/aberto">
+                            <i class="fas fa-clock"></i>
+                            <span>Ouverts</span>
+                        </a>
+                        <a th:classappend="${status} == 'EM_ANDAMENTO' ? 'active'" class="filter-link" href="/agent/dashboard/em_andamento">
+                            <i class="fas fa-spinner"></i>
+                            <span>En cours</span>
+                        </a>
+                        <a th:classappend="${status} == 'FINALIZADO' ? 'active'" class="filter-link" href="/agent/dashboard/finalizado">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Terminés</span>
+                        </a>
                     </div>
                 </div>
 
-                <!-- Priorité -->
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Par priorité</label>
-                    <div class="d-flex flex-column">
-                        <a class="nav-link py-1" href="/agent/dashboard/priority/all">Toutes</a>
-                        <a class="nav-link py-1" href="/agent/dashboard/priority/faible" style="color: #28a745">Faible</a>
-                        <a class="nav-link py-1" href="/agent/dashboard/priority/moyen" style="color: #ffc107">Moyenne</a>
-                        <a class="nav-link py-1" href="/agent/dashboard/priority/eleve" style="color: #fd7e14">Élevée</a>
-                        <a class="nav-link py-1" href="/agent/dashboard/priority/critique" style="color: #dc3545">Critique</a>
+                <!-- Priorité (si disponible) -->
+                <div class="col-md-4 mb-3 filter-section">
+                    <div class="filter-title">
+                        <i class="fas fa-flag"></i>
+                        <span>Par priorité</span>
+                    </div>
+                    <div class="filter-links">
+                        <a class="filter-link" href="/agent/dashboard/priority/all">
+                            <i class="fas fa-border-all"></i>
+                            <span>Toutes</span>
+                        </a>
+                        <a class="filter-link" href="/agent/dashboard/priority/faible" style="color: #28a745">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>Faible</span>
+                        </a>
+                        <a class="filter-link" href="/agent/dashboard/priority/moyen" style="color: #ffc107">
+                            <i class="fas fa-minus"></i>
+                            <span>Moyenne</span>
+                        </a>
+                        <a class="filter-link" href="/agent/dashboard/priority/eleve" style="color: #fd7e14">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>Élevée</span>
+                        </a>
+                        <a class="filter-link" href="/agent/dashboard/priority/critique" style="color: #dc3545">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Critique</span>
+                        </a>
                     </div>
                 </div>
 
                 <!-- Assignation -->
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Par assignation</label>
-                    <div class="d-flex flex-column">
-                        <a class="nav-link py-1" href="/agent/dashboard/assign/all">Tous</a>
-                        <a class="nav-link py-1" href="/agent/dashboard/assign/mine">Mes tickets</a>
-                        <a class="nav-link py-1" href="/agent/dashboard/assign/unassigned">Non assignés</a>
-                        <a class="nav-link py-1" href="/agent/dashboard/assign/others">Autres agents</a>
+                <div class="col-md-4 mb-3 filter-section">
+                    <div class="filter-title">
+                        <i class="fas fa-user-check"></i>
+                        <span>Par assignation</span>
+                    </div>
+                    <div class="filter-links">
+                        <a class="filter-link" href="/agent/dashboard/assign/all">
+                            <i class="fas fa-border-all"></i>
+                            <span>Tous</span>
+                        </a>
+                        <a class="filter-link" href="/agent/dashboard/assign/mine">
+                            <i class="fas fa-user"></i>
+                            <span>Mes tickets</span>
+                        </a>
+                        <a class="filter-link" href="/agent/dashboard/assign/unassigned">
+                            <i class="fas fa-user-slash"></i>
+                            <span>Non assignés</span>
+                        </a>
+                        <a class="filter-link" href="/agent/dashboard/assign/others">
+                            <i class="fas fa-users"></i>
+                            <span>Autres agents</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -62,47 +457,100 @@
     </div>
 
     <!-- Liste des tickets -->
-    <div th:each="ticket : ${tickets}" class="card mb-3">
-        <!-- En-tête du ticket avec indicateur de priorité -->
-        <div class="card-header d-flex justify-content-between align-items-center"
-             th:style="${ticket.priority != null} ? 'border-left: 5px solid ' + ${ticket.priority.getColorCode()} + ';' : ''"
-             th:classappend="${ticket.status.name()} == 'ABERTO' ? 'alert-warning' :
-                                (${ticket.status.name()} == 'EM_ANDAMENTO' ? 'alert-success' : 'alert-dark')">
-            <span th:text="'Ticket #' + ${ticket.getId()}">Ticket</span>
-            <div>
-                    <span th:if="${ticket.priority != null}" class="badge me-2"
-                          th:style="'background-color: ' + ${ticket.priority.getColorCode()} + ';'"
-                          th:text="${ticket.priority}">Priorité</span>
-                <span th:if="${ticket.agent == null}" class="badge bg-secondary">Non assigné</span>
-                <span th:if="${ticket.agent != null && ticket.agent.id != session.SPRING_SECURITY_CONTEXT.authentication.principal.id}"
-                      class="badge bg-info text-dark" th:text="${ticket.agent.username}">Autre agent</span>
-            </div>
+    <div th:if="${tickets.isEmpty()}" class="empty-state">
+        <div class="empty-state-icon">
+            <i class="fas fa-ticket-alt"></i>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-8">
-                    <h5 th:text="${ticket.subject}" class="card-title">Sujet</h5>
-                    <p class="card-text">
-                        <small class="text-muted">
-                            <span th:text="${'Étudiant: ' + ticket.student.username}">Étudiant</span> |
-                            <span th:text="${'Créé le: ' + #temporals.format(ticket.creationDate, 'dd/MM/yyyy HH:mm')}">Date</span>
-                        </small>
-                    </p>
-                    <p class="card-text" th:if="${!ticket.messages.isEmpty()}" th:text="${ticket.messages[0].text.length() > 100 ? ticket.messages[0].text.substring(0, 100) + '...' : ticket.messages[0].text}">
-                        Aperçu du message...
-                    </p>
+        <h3>Aucun ticket trouvé</h3>
+        <p class="text-muted">Aucun ticket ne correspond aux filtres sélectionnés.</p>
+    </div>
+
+    <div th:unless="${tickets.isEmpty()}" class="ticket-list">
+        <div th:each="ticket : ${tickets}" class="ticket-card animate-fade-in">
+            <div th:switch="${ticket.status.name()}" class="ticket-header"
+                 th:classappend="${ticket.status.name() == 'ABERTO' ? 'status-open' :
+                                    (ticket.status.name() == 'EM_ANDAMENTO' ? 'status-progress' : 'status-closed')}">
+                <div class="ticket-number">
+                    <span class="status-indicator"></span>
+                    <span th:text="'Ticket #' + ${ticket.getId()}">Ticket #123</span>
                 </div>
-                <div class="col-md-4 d-flex flex-column justify-content-center align-items-end">
-                    <div class="btn-group" role="group">
-                        <form method="post" th:action="@{'/ticket/' + ${ticket.id} + '/take'}" th:if="${ticket.status.name()} == 'ABERTO'">
-                            <button type="submit" class="btn btn-success me-2">Prendre en charge</button>
-                        </form>
-                        <a th:href="@{/ticket/{id}(id=${ticket.id})}" class="btn btn-primary">Détails</a>
+                <div class="ticket-badges">
+                        <span th:if="${ticket.priority != null}" class="badge-custom"
+                              th:style="'background-color: ' + ${ticket.priority.getColorCode()} + ';'"
+                              th:text="${ticket.priority}">Priorité</span>
+                    <span th:if="${ticket.agent == null}" class="badge bg-secondary badge-custom">Non assigné</span>
+                    <span th:if="${ticket.agent != null && ticket.agent.id != session.SPRING_SECURITY_CONTEXT.authentication.principal.id}"
+                          class="badge bg-info text-dark badge-custom" th:text="${ticket.agent.username}">Autre agent</span>
+                </div>
+            </div>
+            <div class="ticket-body">
+                <h3 class="ticket-title" th:text="${ticket.subject}">Sujet du ticket</h3>
+                <div class="ticket-meta">
+                    <div class="ticket-meta-item">
+                        <i class="fas fa-user"></i>
+                        <span th:text="${ticket.student.username}">Étudiant</span>
                     </div>
+                    <div class="ticket-meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span th:text="${#temporals.format(ticket.creationDate, 'dd/MM/yyyy HH:mm')}">Date</span>
+                    </div>
+                    <div class="ticket-meta-item" th:if="${ticket.sector != null}">
+                        <i class="fas fa-building"></i>
+                        <span th:text="${ticket.sector}">Secteur</span>
+                    </div>
+                </div>
+                <div class="ticket-message" th:if="${!ticket.messages.isEmpty()}"
+                     th:text="${ticket.messages[0].text.length() > 100 ? ticket.messages[0].text.substring(0, 100) + '...' : ticket.messages[0].text}">
+                    Aperçu du message...
+                </div>
+                <div class="ticket-actions">
+                    <form method="post" th:action="@{'/ticket/' + ${ticket.id} + '/take'}" th:if="${ticket.status.name()} == 'ABERTO'">
+                        <button type="submit" class="btn btn-action btn-assign">
+                            <i class="fas fa-hand-paper"></i>
+                            Prendre en charge
+                        </button>
+                    </form>
+                    <a th:href="@{/ticket/{id}(id=${ticket.id})}" class="btn btn-action btn-view">
+                        <i class="fas fa-eye"></i>
+                        Voir les détails
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // Toggle des filtres
+    function toggleFilters() {
+        const filtersBody = document.getElementById('filters-body');
+        const filtersIcon = document.getElementById('filters-icon');
+
+        if (filtersBody.style.display === 'none') {
+            filtersBody.style.display = 'block';
+            filtersIcon.classList.remove('fa-chevron-down');
+            filtersIcon.classList.add('fa-chevron-up');
+        } else {
+            filtersBody.style.display = 'none';
+            filtersIcon.classList.remove('fa-chevron-up');
+            filtersIcon.classList.add('fa-chevron-down');
+        }
+    }
+
+    // Animation au défilement
+    document.addEventListener('DOMContentLoaded', function() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.ticket-card').forEach(card => {
+            observer.observe(card);
+        });
+    });
+</script>
 </body>
 </html>

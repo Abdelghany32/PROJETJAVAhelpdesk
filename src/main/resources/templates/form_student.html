@@ -1,44 +1,299 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:attr="data-theme='light'">
 <head>
-    <title>Cadastrar</title>
+    <title>Inscription Étudiant</title>
     <div th:replace="~{base :: head}"></div>
+    <style>
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .register-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--card-background);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .register-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .register-header::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 20px;
+            background-color: var(--card-background);
+            border-radius: 50% 50% 0 0;
+        }
+
+        .register-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .register-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .register-form {
+            padding: 2rem;
+            box-shadow: none;
+            margin: 0;
+            background: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            background-color: var(--background-color);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+            transform: translateY(-2px);
+            outline: none;
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--danger-color);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        .invalid-feedback {
+            display: block;
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: var(--danger-color);
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            color: var(--gray-color);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus + .input-icon {
+            color: var(--primary-color);
+        }
+
+        .password-toggle {
+            cursor: pointer;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--gray-color);
+        }
+
+        .register-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .register-footer a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+
+        .register-footer a:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        .student-icon {
+            animation: float 3s ease-in-out infinite;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 80px;
+            height: 80px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
 </head>
 <body>
 <div th:replace="~{base :: logo-no-logout}"></div>
 
+<div class="register-container">
+    <div class="register-content">
+        <div class="register-card">
+            <div class="register-header">
+                <div class="student-icon">
+                    <i class="fas fa-user-graduate fa-3x"></i>
+                </div>
+                <h1 class="register-title">Inscription Étudiant</h1>
+                <p class="register-subtitle">Créez votre compte pour accéder à la plateforme</p>
+            </div>
 
-<form  th:object="${student}" method="POST" action="/student/new" class="login-form">
-        <div class="form-group" >
-            <label for="nome">Nome completo</label>
-            <input th:errorclass="is-invalid" th:field="*{username}" type="text" class="form-control" id="nome" placeholder="Nome completo">
-            <div class="invalid-feedback" th:errors="*{username}">
-                Erros do nome de usuário
-            </div>
+            <form th:object="${student}" method="POST" action="/student/new" class="register-form">
+                <div class="form-group">
+                    <label for="nome" class="form-label">Nom complet</label>
+                    <input th:errorclass="is-invalid" th:field="*{username}" type="text" class="form-control" id="nome" placeholder="Votre nom complet">
+                    <i class="fas fa-user input-icon"></i>
+                    <div class="invalid-feedback" th:errors="*{username}">
+                        Erreurs du nom d'utilisateur
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="registration" class="form-label">Numéro de matricule</label>
+                    <input th:field="*{registration}" th:errorclass="is-invalid" type="text" class="form-control" id="registration" placeholder="Votre numéro de matricule">
+                    <i class="fas fa-id-card input-icon"></i>
+                    <div class="invalid-feedback" th:errors="*{registration}">
+                        Erreurs de matricule
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Adresse email</label>
+                    <input type="email" th:errorclass="is-invalid" th:field="*{email}" class="form-control" id="email" placeholder="Votre adresse email">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <div class="invalid-feedback" th:errors="*{email}">
+                        Erreurs d'email
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Mot de passe</label>
+                    <input type="password" th:errorclass="is-invalid" th:field="*{password}" class="form-control" id="password" placeholder="Votre mot de passe">
+                    <i class="fas fa-eye-slash input-icon password-toggle" onclick="togglePassword()"></i>
+                    <div class="invalid-feedback" th:errors="*{password}">
+                        Erreurs de mot de passe
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-register">
+                    <i class="fas fa-user-plus me-2"></i>S'inscrire
+                </button>
+
+                <div class="register-footer">
+                    <p>Déjà inscrit? <a href="/student/login">Connectez-vous</a></p>
+                </div>
+            </form>
         </div>
-        <div class="form-group">
-            <label for="registration">Matrícula</label>
-            <input th:field="*{registration}" th:errorclass="is-invalid" type="text" class="form-control" id="registration" placeholder="Matricula">
-            <div class="invalid-feedback" th:errors="*{registration}">
-                Erros de registration
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" th:errorclass="is-invalid" th:field="*{email}" class="form-control" id="email" placeholder="Enter email">
-            <div class="invalid-feedback" th:errors="*{email}">
-                Erros do email
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="password">Senha</label>
-            <input type="password" th:errorclass="is-invalid" th:field="*{password}" class="form-control" id="password" placeholder="Senha">
-            <div class="invalid-feedback" th:errors="*{password}">
-                Erros da senha
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+    </div>
+</div>
+
+<script>
+    // Toggle pour afficher/masquer le mot de passe
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const passwordToggle = document.querySelector('.password-toggle');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordToggle.classList.remove('fa-eye-slash');
+            passwordToggle.classList.add('fa-eye');
+        } else {
+            passwordInput.type = 'password';
+            passwordToggle.classList.remove('fa-eye');
+            passwordToggle.classList.add('fa-eye-slash');
+        }
+    }
+
+    // Animation des champs de formulaire
+    document.addEventListener('DOMContentLoaded', function() {
+        const formControls = document.querySelectorAll('.form-control');
+
+        formControls.forEach((control, index) => {
+            control.style.opacity = '0';
+            control.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                control.style.transition = 'all 0.5s ease';
+                control.style.opacity = '1';
+                control.style.transform = 'translateY(0)';
+            }, 300 + (index * 200));
+        });
+
+        const registerButton = document.querySelector('.btn-register');
+        registerButton.style.opacity = '0';
+        registerButton.style.transform = 'translateY(20px)';
+
+        setTimeout(() => {
+            registerButton.style.transition = 'all 0.5s ease';
+            registerButton.style.opacity = '1';
+            registerButton.style.transform = 'translateY(0)';
+        }, 300 + (formControls.length * 200));
+    });
+</script>
 </body>
 </html>

@@ -25,20 +25,5 @@ public class TicketerApplication {
 		SpringApplication.run(TicketerApplication.class, args);
 	}
 
-//	@Bean
-//	CommandLineRunner runner(){
-//		return args -> {
-//			Role userRole = roleRepository.findByName("ROLE_ADMIN");
-//			Agente agente = new Agente("Edson", encoder.encode("12345"), "edson@ra.com", Setor.EAD);
-//			agente.setRoles(Arrays.asList(userRole));
-//			agenteRepository.save(agente);
-//			agente = new Agente("Edna", encoder.encode("12345"), "edna@ra.com", Setor.FINANCEIRO);
-//			agente.setRoles(Arrays.asList(userRole));
-//			agenteRepository.save(agente);
-//			agente = new Agente("Edilson", encoder.encode("12345"), "edilson@ra.com", Setor.SECRETARIA);
-//			agente.setRoles(Arrays.asList(userRole));
-//			agenteRepository.save(agente);
-//		};
-//	}
 
 }

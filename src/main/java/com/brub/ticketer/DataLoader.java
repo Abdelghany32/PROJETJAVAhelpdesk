@@ -62,13 +62,13 @@ public class DataLoader implements
     public void createUsersIfNotFound() {
         if(agentRepository.findAll().size()==0) {
             Role userRole = roleRepository.findByName("ROLE_ADMIN");
-            Agent agent = new Agent("Edson", encoder.encode("12345"), "ead@ra.com", Sector.EAD);
+            Agent agent = new Agent("Edson", encoder.encode("12345"), "ghany@ead.com", Sector.EAD);
             agent.setRoles(Arrays.asList(userRole));
             agentRepository.save(agent);
-            agent = new Agent("Edna", encoder.encode("12345"), "tesouraria@ra.com", Sector.FINANCEIRO);
+            agent = new Agent("Edna", encoder.encode("12345"), "ghany@financial.com", Sector.FINANCIAL);
             agent.setRoles(Arrays.asList(userRole));
             agentRepository.save(agent);
-            agent = new Agent("Edilson", encoder.encode("12345"), "secretaria@ra.com", Sector.SECRETARIA);
+            agent = new Agent("Edilson", encoder.encode("12345"), "ghany@secretary.com", Sector.SECRETARY);
             agent.setRoles(Arrays.asList(userRole));
             agentRepository.save(agent);
         }

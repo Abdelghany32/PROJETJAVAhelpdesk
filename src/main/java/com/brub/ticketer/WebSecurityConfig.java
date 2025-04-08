@@ -41,11 +41,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			 http.antMatcher("/student/**")
+			http.antMatcher("/student/**")
 					.authorizeRequests()
 					.antMatchers("/resources/static/**", "/css/**").permitAll()
-					 .antMatchers(HttpMethod.GET,"/student/form_student").permitAll()
-					 .antMatchers(HttpMethod.POST, "/student/new").permitAll()
+					.antMatchers(HttpMethod.GET,"/student/form_student").permitAll()
+					.antMatchers(HttpMethod.POST, "/student/new").permitAll()
+					.antMatchers("/settings/student", "/profile/student").hasRole("USER")
 					.anyRequest().hasRole("USER")
 					.and()
 					.formLogin(form -> form
@@ -53,8 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 							.defaultSuccessUrl("/student/dashboard", true)
 							.permitAll()
 					).csrf().disable();
-		}
-	}
+		}}
 
 	@Configuration
 	@Order(2)
@@ -62,11 +62,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			  http.antMatcher("/agent/**")
+			http.antMatcher("/agent/**")
 					.authorizeRequests()
 					.antMatchers("/resources/static/**", "/css/**").permitAll()
 					.antMatchers(HttpMethod.GET, "/agent/login").permitAll()
 					.antMatchers(HttpMethod.POST, "/agent/login").permitAll()
+					.antMatchers("/settings/agent", "/profile/agent").hasRole("ADMIN")
 					.anyRequest().hasRole("ADMIN")
 					.and()
 					.formLogin(form -> form
