@@ -19,37 +19,7 @@
 			integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
 			crossorigin="anonymous"></script>
 
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-            // Fonction pour appliquer le thème
-            function applyTheme(theme) {
-                document.documentElement.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-            }
 
-            // Initialisation du thème
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            if (savedTheme) {
-                applyTheme(savedTheme);
-            } else if (prefersDark) {
-                applyTheme('dark');
-            } else {
-                applyTheme('light');
-            }
-
-            // Basculer le thème lorsque le bouton est cliqué
-            const toggleButtons = document.querySelectorAll('.theme-toggle');
-            toggleButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                    applyTheme(newTheme);
-                });
-            });
-        });
-	</script>
 </div>
 
 <div th:fragment="logo-al" class="logo-container mb-3 p-3 d-flex justify-content-between align-items-center">
