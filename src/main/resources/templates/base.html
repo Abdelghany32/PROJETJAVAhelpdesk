@@ -19,41 +19,11 @@
 			integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
 			crossorigin="anonymous"></script>
 
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-            // Fonction pour appliquer le thème
-            function applyTheme(theme) {
-                document.documentElement.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-            }
 
-            // Initialisation du thème
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            if (savedTheme) {
-                applyTheme(savedTheme);
-            } else if (prefersDark) {
-                applyTheme('dark');
-            } else {
-                applyTheme('light');
-            }
-
-            // Basculer le thème lorsque le bouton est cliqué
-            const toggleButtons = document.querySelectorAll('.theme-toggle');
-            toggleButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                    applyTheme(newTheme);
-                });
-            });
-        });
-	</script>
 </div>
 
 <div th:fragment="logo-al" class="logo-container mb-3 p-3 d-flex justify-content-between align-items-center">
-	<span class="logo"><a href="/">solve here</a></span>	<div class="d-flex align-items-center">
+	<span class="logo"><a href="/">Ticketer</a></span>	<div class="d-flex align-items-center">
 		<!-- Bouton dark/light mode -->
 		<button class="btn btn-outline-light theme-toggle me-3">
 			<i class="fas fa-moon"></i>
@@ -79,7 +49,7 @@
 </div>
 
 <div th:fragment="logo-ag" class="logo-container mb-3 p-3 d-flex justify-content-between align-items-center">
-	<span class="logo"><a href="/agent/dashboard">solve here</a></span>
+	<span class="logo"><a href="/agent/dashboard">Ticketer</a></span>
 	<div class="d-flex align-items-center">
 		<!-- Bouton dark/light mode -->
 		<button class="btn btn-outline-light theme-toggle me-3">
@@ -106,7 +76,7 @@
 </div>
 
 <div th:fragment="logo-no-logout" class="logo-container mb-3 p-3 d-flex justify-content-between align-items-center">
-	<span class="logo">solve here</span>
+	<span class="logo">Ticketer</span>
 	<div>
 		<!-- Bouton dark/light mode -->
 		<button class="btn btn-outline-light theme-toggle me-3">
